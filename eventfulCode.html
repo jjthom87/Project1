@@ -1,0 +1,194 @@
+<html>
+
+Javascript Sample page <br>
+
+<script type="text/javascript" src="http://api.eventful.com/js/api">
+
+</script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+
+<script type="text/javascript">
+
+function convertDate(dateString){
+  var dateArray = dateString.split("-");
+  console.log(dateArray);
+  var dateJoined = dateArray.join("");
+  console.log(dateJoined);
+  var resultDate=dateJoined+"00";
+  console.log(resultDate);
+  return(resultDate);
+}
+
+function show_alert2()
+
+{
+    console.log(dateBegin.value);
+    var begin = dateBegin.value;
+    var initialDate=convertDate(begin);
+    console.log(initialDate);
+    console.log(dateEnd.value);
+    var end = dateEnd.value;
+    var finalDate=convertDate(dateEnd.value);
+    console.log(finalDate);
+    var inputDate=initialDate+"-"+finalDate;
+    console.log(inputDate);
+
+   var oArgs = {
+
+      app_key: "BNC5TfKMt8nqQmcd",
+
+      q: query.value,
+
+      where: where.value, 
+
+      "date": inputDate,
+
+      page_size: 15,
+
+      sort_order: "popularity",
+
+   };
+
+   EVDB.API.call("/events/search", oArgs, function(oData) {
+
+      console.log(oData);
+      // var results = JSON.stringify(oData);
+      // alert("your myObject is " + results);
+      var resultsVerification=oData.events;
+      var p = $('<p>',{
+        text:"************************************"
+      });
+      $('#result').html(p);
+      if (resultsVerification){
+        var results =oData.events.event;
+        for (var i = 0; i < results.length; i++) {
+          var resultsDiv = $('<div>');
+          resultsDiv.addClass('oderResults');
+          if (results[i].image){
+            var resultImage = $('<img>',{
+            src:results[i].image.medium.url,
+            alt:results[i].title
+            });
+            resultsDiv.append(resultImage);
+          }
+          var p = $('<p>',{
+            text:"Name : "+results[i].title
+          });
+          resultsDiv.append(p);
+          var p = $('<p>',{
+            text:"Start Time : "+results[i].start_time
+          });
+          resultsDiv.append(p);
+          var p = $('<p>',{
+            text:"Place : "+results[i].venue_name
+          });
+          resultsDiv.append(p);
+          var p = $('<p>',{
+            text:"Address : "+results[i].venue_address+" / "+results[i].city_name+", "+results[i].region_name+"  "+results[i].postal_code
+          });
+          resultsDiv.append(p);
+          var p = $('<p>',{
+            text:"Description : " +results[i].description
+          });
+          resultsDiv.append(p);
+          var a =$('<a>',{
+          href:results[i].url,
+          text:"Buy This Event Here ",
+          width: 200
+          });
+          resultsDiv.append(a);
+          var p = $('<p>',{
+            text:"OR"
+          });
+          resultsDiv.append(p);
+          var a =$('<a>',{
+          href:results[i].venue_url,
+          text:" Buy At This Venue Here"
+          });
+          resultsDiv.append(a);
+          var performersRes = results[i].performers;
+          console.log(performersRes);
+          if (performersRes) {
+            var performersResObj = performersRes.performer;
+            console.log(performersResObj.length);
+            if (performersResObj.length){
+              for (var j = 0; j < performersResObj.length; j++) {
+                var p = $('<p>',{
+                text:"OR"
+                });
+                resultsDiv.append(p);
+                var a =$('<a>',{
+                href:performersResObj[j].url,
+                text:" Buy For "+performersResObj[j].name+" Here"
+                });
+                resultsDiv.append(a);
+                if (performersResObj[j].short_bio) {
+                  var p = $('<p>',{
+                  text:"Short Description of "+performersResObj[j].name+" : "+performersResObj[j].short_bio
+                  });
+                  resultsDiv.append(p);
+                }
+              }
+            }else{
+                var p = $('<p>',{
+                text:"OR"
+                });
+                resultsDiv.append(p);
+                var a =$('<a>',{
+                href:performersRes.performer.url,
+                text:" Buy For "+performersRes.performer.name+" Here"
+                });
+                resultsDiv.append(a);
+                if (performersRes.performer.short_bio) {
+                  var p = $('<p>',{
+                  text:"Short Description of "+performersRes.performer.name+" : "+performersRes.performer.short_bio
+                  });
+                  resultsDiv.append(p);
+                }
+              }
+          };
+          var p = $('<p>',{});
+          resultsDiv.append(p);
+          var p = $('<p>',{
+            text:"************************************"
+          })
+          resultsDiv.append(p);
+          var p = $('<p>',{
+            text:"************************************"
+          })
+          resultsDiv.append(p);
+          $('#result').append(resultsDiv);
+        }
+      }else{
+        var p = $('<p>',{
+          text:"Sorry, we could not find results for your search, please try again. Thanks"
+        });
+          $('#result').append(p);
+      }
+      // Note: this relies on the custom toString() methods below
+    });
+}
+</script>
+
+
+
+<body>
+
+Run Sample api searches <br><br>
+
+<form>
+  Where: <input id="where" type="text" name="where"/> <br>
+  Looking for: <input id="query" type="text" name="query"/> <br>
+  Date Range: <input id="dateBegin" type="date" name="dateBegin"/>  To 
+    <input id="dateEnd" type="date" name="dateEnd"/> <br>
+</form>
+
+<input type="button" onclick="show_alert2()" value="Query #2 " /> <br>
+
+<div id="result"></div>
+
+</body>
+
+</html>
+
+
