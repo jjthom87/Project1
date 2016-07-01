@@ -13,8 +13,8 @@
   <!-- This form will be where users input data about the movies -->
   <form id="ticketForm">
     <label for="ticket-input">Search for an Event</label>
-    <input type="text" id="keywordInput"><br>
-    <input type="text" id="totalResultsInput"><br>
+    <br>
+    <input type="text" id="keywordInput" placeholder="Type of Event"><br>
 
     
     <!-- This button will trigger our AJAX call -->
@@ -35,14 +35,19 @@ var apiKey = 'Ob5H8KKC0dIz2nM9oeE2GX3fNoCRFHZE';
 
 		// Here we grab the text from the input box 
 		var keyword = $('#keywordInput').val();
-    var totalResults = $('#totalResultsInput').val();
+    var totalResults = 5;
+    var eventCity = 'NY';
+    var eventCountry = 'US';
+    var ticketMasterUrl = "http://www.ticketmaster.com/search?tm_link=tm_header_search&user_input=" + keyword + "&q=" + keyword;
+
     console.log(totalResults);
 
 		// Here we assemble our URL 
 		var queryURL = 'https://app.ticketmaster.com/discovery/v2/events.json?' +
     'apikey=' + apiKey + '&' +
     'keyword=' + keyword + '&' +
-    'size=' + totalResults;
+    'countryCode=' + eventCountry + '&' +
+    'stateCode' + eventCity;
 
 
     console.log('the queryURL is working: ' + queryURL);
@@ -64,13 +69,37 @@ var apiKey = 'Ob5H8KKC0dIz2nM9oeE2GX3fNoCRFHZE';
 
           for (var i=0 ; i < totalResults; i++) {
 
+            var newDiv = $('<div class = eventClass>');
+
             var eventName = JSON.stringify(results._embedded.events[i].name)
-            console.log('End results is: ' + eventName);
-            var newDiv = $('<div>');
-            newDiv.append(eventName);
+            console.log('Event Name is: ' + eventName);
+            var nameP = $('<p>',{
+                text: 'Event: ' + eventName
+            });
+            newDiv.append(nameP);
+
+            var eventUrl = JSON.stringify(results._embedded.events[i].url);
+            console.log('Event URL is: ' + eventUrl);
+            var urlDiv = $('<div>');
+            var urlAref = $('<a />', {
+              id: "links",
+              name: "link",
+              href: ticketMasterUrl,
+              text: 'Ticketmaster Link'
+            });
+            urlDiv.append(urlAref);
+            newDiv.append(urlDiv);
+
+            //var eventDate = JSON.stringify(results._embedded.events[i].dates.start.localDate);
+            //console.log('Event Date is: ' + eventDate);
+            //var dateP = $('<p>',{
+              //text: 'Date: ' + eventDate
+            //})
+            //newDiv.append(dateP);
+            
+
             $('#searchResults').append(newDiv);
 
-            console.log('Query URL is:' + queryURL);
           }
         });
 		//----
